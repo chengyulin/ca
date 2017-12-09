@@ -1,10 +1,39 @@
-module IF_ID
-(
-    clk_i,
-	flush_i,
-	hazard_i,
-    pc_i,
-	inst_i,
-    pc_o,
-	inst_o
+module IF_ID(
+	clk_i,
+	Stall_i,
+	PC_i,
+	instruction_i,
+	Flush_i,
+	PC_o,
+	instruction_o
 );
+
+input			clk_i;
+input			Stall_i;
+input			Flush_i;
+input	[31:0]	PC_i;
+input	[31:0]	instruction_i;
+output	[31:0]	PC_o;
+output	[31:0]	instruction_o;
+
+reg	[31:0]	tmpPC_o;
+reg	[31:0]	tmpinstruction_o;
+assign PC_o = tmpPC_o;
+assign instruction_o = tmpinstruction_o;
+
+always @(posedge clk) begin
+	if (Stall_i) begin
+		tmpPC_o = PC_o;
+		tmpinstruction_o = instruction_o;
+	end
+	else if (Flush_i) begin
+		tmpPC_o = 32'd0;
+		tmpinstruction_o = 32'd0;
+	end
+	else begin
+		tmpPC_o = PC_i;
+		tmpinstruction_o = instruction_i;
+	end
+end
+
+endmodule
