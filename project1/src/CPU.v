@@ -25,19 +25,25 @@ wire    [1:0]       ctrl_ALUOp;
 wire                ctrl_ALUSrc;
 wire                ctrl_RegWrite;
 wire                zero;
+wire                ctrl_jump;
+wire    [27:0]      sl26_o;
+wire                bubble_o;
+
+assign JumpAddr = {MUX1Res[31:28], Shift_Left_26to28.data_o};
+assign WB_RegWrite = WBWB[1];
+
 
 Control Control(
     .Op_i       (instr_o[31:26]),
-    .RegDst_o   (ctrl_RegDst),
-    .ALUOp_o    (ctrl_ALUOp),
-    .ALUSrc_o   (ctrl_ALUSrc),
-    .RegWrite_o (ctrl_RegWrite)
+    .Jump_o(MUX2_sel),
+    .Branch_o(AND.branch_i),
+    .Control_o(MUX8_8.signal_i)
 );
 
 Adder Add_PC(
     .data1_in   (pc_o),
     .data2_in   (32'h4),
-    .data_o     (pc_i)
+    .data_o     (pc_plus4)
 );
 
 PC PC(
@@ -124,26 +130,16 @@ Equal Equal(
     .data_o     ()
 );
 
-Shift_Left2_26 sl26(
-    .data_i (IF_ID_instr[25:0]),
-    .data_o (sl26_o)
-);
-
-Shift_Left2_32 sl32(
-    .data_i (imm32),
-    .data_o ()
-);
-
 IF_ID IF_ID
 (
     .clk(clk_i),
-    .HD_i(bubble_o),
-    .Add_pc_i(Add_PC_o),
+    .hazard_i(bubble_o),
+    .pc_i(Add_PC_o),
     .Instruction_Memory_i(instr_o),
-    .Flush1_i(mux1.cond_o),
-    .Flush2_i(ctrl_jump),
+    .flush_i(mux1.cond_o),
     .instr_o(IF_ID_instr),
-    .addr_o(IF_ID_addr)
+    .addr_o(IF_ID_addr),
+    .pc_o(Add_PC_o),
 );
 
 ID_EX ID_EX
@@ -206,6 +202,18 @@ Shift_Left_32 Shift_Left_32(
 
 Shift_Left_26 Shift_Left_26(
     .data_i(inst[25:0]),
-    .data_o()  
+    .data_o(sl26_o)  
 );//DONE
 endmodule
+
+AND AND(
+    .data1_i(wire_ctrl_br),
+    .data2_i(wire_zero),
+    .and_o(wire_isbr)
+); 
+
+OR OR(
+    .data1_i(wire_ctrl_j),
+    .data2_i(wire_isbr),
+    .or_o(wire_flush)
+);
