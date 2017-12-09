@@ -98,4 +98,114 @@ ALU_Control ALU_Control(
     .ALUCtrl_o  (aluCtrl_o)
 );
 
+HazardDetection HazardDetection(
+    .bubble_o           (bubble_o),
+    .IF_ID_rs_i         (IF_ID_instr[25:21]),
+    .IF_ID_rt_i         (IF_ID_instr[20:16]),
+    .ID_EX_rt_i         (ID_EX_mux3_o1),
+    .ID_EX_MemRead_i    (ID_EX_M[1])
+);
+
+FW FW
+(
+    .forward_MUX6   (),
+    .forward_MUX7   (),
+    .IDEX_rs        (ID_EX.FW_o1),
+    .IDEX_rt        (ID_EX.FW_o2),
+    .EXMEM_rd       (EX_MEM_in3),
+    .EXMEM_write    (EX_MEM_wb[1]),
+    .MEMWB_rd       (MEM_WB_in3),
+    .MEMWB_write    (MEM_WB_RegWrite)
+);
+
+Equal Equal(
+    .data1_i    (rsData_o),
+    .data2_i    (rtData_o),
+    .data_o     ()
+);
+
+Shift_Left2_26 sl26(
+    .data_i (IF_ID_instr[25:0]),
+    .data_o (sl26_o)
+);
+
+Shift_Left2_32 sl32(
+    .data_i (imm32),
+    .data_o ()
+);
+
+IF_ID IF_ID
+(
+    .clk(clk_i),
+    .HD_i(bubble_o),
+    .Add_pc_i(Add_PC_o),
+    .Instruction_Memory_i(instr_o),
+    .Flush1_i(mux1.cond_o),
+    .Flush2_i(ctrl_jump),
+    .instr_o(IF_ID_instr),
+    .addr_o(IF_ID_addr)
+);
+
+ID_EX ID_EX
+(
+    .clk(clk_i),
+    .mux8_i(mux8_out),
+    .addr_i(IF_ID_addr),
+    .data1_i(rsData_o),
+    .data2_i(rtData_o),
+    .Sign_extend_i(imm32),
+    .instr_i(IF_ID_instr),
+    .EX_MEM_WB_o(),
+    .EX_MEM_M_o(ID_EX_M),
+    .ALUSrc_o(),
+    .ALUOp_o(),
+    .RegDst_o(),
+    .mux6_o(),
+    .mux7_o(),
+    .mux4_o(ID_EX_mux4_out),
+    .ALU_control_o(),
+    .FW_o1(),
+    .FW_o2(),
+    .mux3_o1(ID_EX_mux3_o1),
+    .mux3_o2()
+);
+
+EX_MEM EX_MEM
+(
+    .clk(clk_i),
+    .wb(ID_EX.EX_MEM_WB_o),
+    .m(ID_EX_M),
+    .in1(alu_o),
+    .in2(mux7_data_o),
+    .in3(mux3.data_o),
+    .wb_out(EX_MEM_wb),
+    .mem_read(),
+    .mem_write(),
+    .in1_out(EX_MEM_in1),
+    .in2_out(),
+    .in3_out(EX_MEM_in3)
+);
+
+MEM_WB MEM_WB
+(
+    .clk(clk_i),
+    .wb(EX_MEM_wb),
+    .in1(Data_Memory.read_data_o),
+    .in2(EX_MEM_in1),
+    .in3(EX_MEM_in3),
+    .reg_write(MEM_WB_RegWrite),
+    .mem_to_reg(),
+    .in1_out(),
+    .in2_out(),
+    .in3_out(MEM_WB_in3)
+);
+Shift_Left_32 Shift_Left_32(
+    .data_i(signExtended),
+    .data_o(Add_Branch.data1_in)  
+);//DONE
+
+Shift_Left_26 Shift_Left_26(
+    .data_i(inst[25:0]),
+    .data_o()  
+);//DONE
 endmodule
