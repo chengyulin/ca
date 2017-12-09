@@ -10,7 +10,17 @@ input	[4:0]	data2_i;
 input			select_i;
 output	[4:0]	data_o;
 
-// if(select)out = i2 else out = i1
-assign data_o = select_i ? data2_i : data1_i;
+reg	[4:0]	tmpdata_o;
+assign data_o = tmpdata_o;
+
+always @(*) begin
+	if (select_i) begin
+		tmpdata_o = data2_i;
+	end
+	else begin
+		tmpdata_o = data1_i;
+	end
+end
+// assign data_o = select_i ? data2_i : data1_i;
 
 endmodule

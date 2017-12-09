@@ -29,8 +29,13 @@ assign  RTdata_o = register[RTaddr_i];
 
 // Write Data   
 always@(posedge clk_i) begin
-    if(RegWrite_i)
+    if(RegWrite_i) begin
         register[RDaddr_i] <= RDdata_i;
+        // $fdisplay(3,"==========register==========");
+        // $fdisplay(3, "RD %d %d, RegWrite_i = %d", RDaddr_i, RDdata_i, RegWrite_i);
+        // $fdisplay(3,"============================");
+    end  
+    
 end
    
 endmodule 

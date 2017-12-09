@@ -21,7 +21,14 @@ reg	[31:0]	tmpinstruction_o;
 assign PC_o = tmpPC_o;
 assign instruction_o = tmpinstruction_o;
 
-always @(posedge clk) begin
+initial begin
+#5
+	tmpPC_o = 0;
+	tmpinstruction_o = 0;	
+end
+
+
+always @(posedge clk_i) begin
 	if (Stall_i) begin
 		tmpPC_o = PC_o;
 		tmpinstruction_o = instruction_o;
