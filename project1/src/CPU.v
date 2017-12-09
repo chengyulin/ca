@@ -11,23 +11,75 @@ input               rst_i;
 input               start_i;
 
 //wire[31:0]  inst_addr, inst;
-wire    [31:0]      pc_i, pc_o;
-wire    [31:0]      instr_o;
-wire    [4:0]       regDst_o;
-wire    [31:0]      imm32;
-wire    [31:0]      rsData_o;
-wire    [31:0]      rtData_o;
-wire    [31:0]      aluSrc_o;
-wire    [2:0]       aluCtrl_o;
-wire    [31:0]      alu_o;
-wire                ctrl_RegDst;
-wire    [1:0]       ctrl_ALUOp;
-wire                ctrl_ALUSrc;
-wire                ctrl_RegWrite;
-wire                zero;
-wire                ctrl_jump;
-wire    [27:0]      sl26_o;
-wire                bubble_o;
+wire    [31:0]      wire_pc;
+wire    [31:0]      wire_pc_ret;
+wire    [31:0]      wire_ifid_pc_ret;
+wire    [31:0]      wire_inst;
+wire    [31:0]      wire_ifid_inst;
+wire                wire_reg_dst; // from Control
+wire                wire_reg_wr; // from Control
+wire                wire_alu_src; // from Control
+wire                wire_ctrl_mtr; // from Control to mux32 WBSrc
+wire                wire_ctrl_mw; // from Control to Data_Memory
+wire                wire_ctrl_mr; // from Control to Data_Memory
+wire                wire_ctrl_br; // from Control to AND_Branch
+wire                wire_ctrl_j; // from Control to MUX_Jump
+wire                wire_zero; // from EQ to AND_Branch
+wire                wire_isbr; // from AND_Branch to MUX_Branch
+wire    [1:0]       wire_alu_op; // from Control
+wire    [2:0]       wire_alu_ctrl; // from ALU_Control
+wire    [4:0]       wire_wr_reg; // from MUX5
+wire    [31:0]      wire_data1; // from Registers
+wire    [31:0]      wire_data2; // from Registers
+wire    [31:0]      wire_sign_ext; // from Sign_Extend
+wire    [31:0]      wire_mux32_alusrc; // from MUX32 alusrc
+wire    [31:0]      wire_mux32_wbsrc; // from MUX32 wbsrc
+wire    [31:0]      wire_mux32_br; // from MUX_Branch
+wire    [31:0]      wire_mux32_j; // from MUX_Jump
+wire    [31:0]      wire_alu_out; // from ALU
+wire    [31:0]      wire_mem_out; // from Data_Memory
+wire    [31:0]      wire_sll_br; // from ssl_branch
+wire    [31:0]      wire_sll_j; // from ssl_j
+wire    [31:0]      wire_add_br; // from Add_Branch
+
+wire            wire_memwb_ctrl_rw;
+wire            wire_memwb_ctrl_mtr;
+wire    [31:0]      wire_memwb_alu_out;
+wire    [31:0]      wire_memwb_mem_out;
+wire    [4:0]       wire_memwb_wr_reg;
+
+wire            wire_exmem_ctrl_mr;
+wire            wire_exmem_ctrl_mw;
+wire    [1:0]       wire_exmem_wb;
+wire    [4:0]       wire_exmem_wr_reg;
+wire    [31:0]      wire_exmem_alu_out;
+wire    [31:0]      wire_exmem_data2;
+
+wire    [1:0]       wire_idex_wb;
+wire    [1:0]       wire_idex_m;
+wire            wire_idex_ctrl_alusrc;
+wire    [1:0]       wire_idex_ctrl_aluop;
+wire            wire_idex_ctrl_rd;
+wire    [31:0]      wire_idex_data1;
+wire    [31:0]      wire_idex_data2;
+wire    [31:0]      wire_idex_signext;
+wire    [4:0]       wire_idex_rsaddr;
+wire    [4:0]       wire_idex_rtaddr;
+wire    [4:0]       wire_idex_rdaddr;
+
+wire    [1:0]       wire_fw_sel1;
+wire    [1:0]       wire_fw_sel2;
+wire    [31:0]      wire_fw_out1;
+wire    [31:0]      wire_fw_out2;
+
+
+wire                wire_pc_stall;
+wire                wire_ifid_stall;
+wire                wire_mux8_stall;
+wire    [7:0]       wire_mux8_data_o;
+
+wire                wire_flush;
+
 
 assign JumpAddr = {MUX1Res[31:28], Shift_Left_26to28.data_o};
 assign WB_RegWrite = WBWB[1];
@@ -56,8 +108,8 @@ PC PC(
 );
 
 Instruction_Memory Instruction_Memory(
-    .addr_i     (pc_o),
-    .instr_o    (instr_o)
+    .addr_i     (wire_pc),
+    .instr_o    (wire_inst)
 );
 
 Registers Registers(
