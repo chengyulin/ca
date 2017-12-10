@@ -199,7 +199,7 @@ HD HD(
 
 MUX8 MUX8(
 	.data1_i({wire_reg_dst, wire_alu_op[1:0], wire_alu_src, wire_reg_wr, wire_ctrl_mw, wire_ctrl_mr, wire_ctrl_mtr}),
-	.data2_i(8'b0),
+	.data2_i(8'd0),
 	.select_i(wire_mux8_stall),
 	.data_o(wire_mux8_data_o)
 );
@@ -304,6 +304,7 @@ EX_MEM EXMEM(
 );
 
 Data_Memory Data_Memory(
+	.clk_i(clk_i), // new
 	.addr_i(wire_exmem_alu_out),
 	.data_i(wire_exmem_data2),
 	.MemWrite_i(wire_exmem_ctrl_mw),

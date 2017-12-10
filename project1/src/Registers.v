@@ -23,17 +23,14 @@ output  [31:0]      RTdata_o;
 // Register File
 reg     [31:0]      register        [0:31];
 
-// Read Data      
-assign  RSdata_o = register[RSaddr_i];
-assign  RTdata_o = register[RTaddr_i];
+// Read Data 
+assign RSdata_o = (RegWrite_i && (RSaddr_i==RDaddr_i)) ? RDdata_i : register[RSaddr_i];
+assign RTdata_o = (RegWrite_i && (RTaddr_i==RDaddr_i)) ? RDdata_i : register[RTaddr_i];
 
 // Write Data   
 always@(posedge clk_i) begin
     if(RegWrite_i) begin
         register[RDaddr_i] <= RDdata_i;
-        // $fdisplay(3,"==========register==========");
-        // $fdisplay(3, "RD %d %d, RegWrite_i = %d", RDaddr_i, RDdata_i, RegWrite_i);
-        // $fdisplay(3,"============================");
     end  
     
 end

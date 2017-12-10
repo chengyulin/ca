@@ -30,16 +30,16 @@ end
 
 always @(posedge clk_i) begin
 	if (Stall_i) begin
-		tmpPC_o = PC_o;
-		tmpinstruction_o = instruction_o;
+		tmpPC_o <= PC_o;
+		tmpinstruction_o <= instruction_o;
 	end
 	else if (Flush_i) begin
-		tmpPC_o = 32'd0;
-		tmpinstruction_o = 32'd0;
+		tmpPC_o <= 32'd0;
+		tmpinstruction_o <= 32'd0;
 	end
 	else begin
-		tmpPC_o = PC_i;
-		tmpinstruction_o = instruction_i;
+		tmpPC_o <= PC_i;
+		tmpinstruction_o <= instruction_i;
 	end
 end
 

@@ -37,10 +37,10 @@ initial begin
     end
     
     // Load instructions into instruction memory
-    $readmemb("Fibonacci_instruction.txt", CPU.Instruction_Memory.memory);
+    $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
-    outfile = $fopen("Fibonacci_output.txt") | 1;
+    outfile = $fopen("output.txt") | 1;
     
     // Set Input n into data memory at 0x00
     CPU.Data_Memory.memory[0] = 8'h5;       // n = 5 for example
@@ -65,6 +65,7 @@ always@(posedge Clk) begin
     if(CPU.OR_Flush.or_o == 1)flush = flush + 1;  
 
     // print PC
+    // $fdisplay(3,"instruction = %b",CPU.Instruction_Memory.instr_o);
     $fdisplay(outfile, "cycle = %d, Start = %d, Stall = %d, Flush = %d\nPC = %d", counter, Start, stall, flush, CPU.PC.pc_o);
     
     // print Registers

@@ -30,23 +30,4 @@ always@(*) begin
 	end
 end
 
-// always @(*) begin
-// 	if(ALUOp_i == 2'b10) begin
-// 		case(funct_i)
-// 			6'b100000:	tmp = 3'b000; // add
-// 			6'b100010:	tmp = 3'b001; // sub
-// 			6'b100100:	tmp = 3'b010; // and
-// 			6'b100101:	tmp = 3'b011; // or
-// 			6'b011000:	tmp = 3'b100; // mul
-// 			default:	tmp = 3'b111;
-// 		endcase
-// 	end
-// 	else if(ALUOp_i == 2'b01) begin
-// 		tmp = 3'b001;
-// 	end
-// 	else begin
-// 		tmp = 3'b000; // addi
-// 	end
-// end
-
 endmodule

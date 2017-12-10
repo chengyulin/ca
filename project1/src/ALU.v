@@ -25,7 +25,6 @@ always @(*) begin
 		3'b011: tmpdata_o = data1_i | data2_i;	// or
 		3'b100: tmpdata_o = data1_i * data2_i;	// mul
 	endcase
-	// $fdisplay(3, "alu result = %d", tmpdata_o);
 end
 
 endmodule

@@ -29,14 +29,14 @@ assign MemData_o = tmpMemData_o;
 assign RegData_o = tmpRegData_o;
 assign RegAddr_o = tmpRegAddr_o;
 
-// initial begin
-// #20
-// 	tmpRegWrite_o = 0;
-// 	tmpMemtoReg_o = 0;
-// 	tmpMemData_o = 0;
-// 	tmpRegData_o = 0;
-// 	tmpRegAddr_o = 0;
-// end
+initial begin
+#20
+	tmpRegWrite_o = 0;
+	tmpMemtoReg_o = 0;
+	tmpMemData_o = 0;
+	tmpRegData_o = 0;
+	tmpRegAddr_o = 0;
+end
 
 always @ (posedge clk_i) begin
  	tmpRegWrite_o <= WB_i[0];
